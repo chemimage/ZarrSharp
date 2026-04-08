@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Zarr.Codecs.Blosc</RootNamespace>
+    <BloscNativeOutputDir>$(MSBuildProjectDirectory)\artifacts\$(Configuration)\win-x64\native</BloscNativeOutputDir>
+    <BloscNativeOutputPath>$(BloscNativeOutputDir)\blosc.dll</BloscNativeOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="6.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <Compile Remove="native\**\*.cs" />
+    <None Include="$(BloscNativeOutputPath)" Link="blosc.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="BuildNativeBlosc"
+          BeforeTargets="PrepareForBuild"
+          Inputs="$(MSBuildProjectDirectory)\BuildNativeBlosc.ps1;$(MSBuildProjectDirectory)\native\c-blosc\.git"
+          Outputs="$(BloscNativeOutputPath)">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\BuildNativeBlosc.ps1&quot; -ProjectDir &quot;$(MSBuildProjectDirectory)&quot; -Configuration &quot;$(Configuration)&quot;" />
+  </Target>
+
+  <Target Name="UseGitVersionPackageVersion" AfterTargets="GetVersion" Condition="'$(GitVersion_MajorMinorPatch)' != ''">
+    <PropertyGroup>
+      <Version Condition="'$(GitVersion_PreReleaseLabel)' == ''">$(GitVersion_MajorMinorPatch)</Version>
+      <Version Condition="'$(GitVersion_PreReleaseLabel)' != ''">$(GitVersion_SemVer)</Version>
+      <PackageVersion Condition="'$(GitVersion_PreReleaseLabel)' == ''">$(GitVersion_MajorMinorPatch)</PackageVersion>
+      <PackageVersion Condition="'$(GitVersion_PreReleaseLabel)' != ''">$(GitVersion_FullSemVer)</PackageVersion>
+    </PropertyGroup>
+  </Target>
+
+</Project>

@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>ZarrSharp</PackageId>
+    <Title>ZarrSharp</Title>
+    <Company>Chemical Imaging and Structure Lab</Company>
+    <Authors>$(Authors)</Authors>
+    <PackageProjectUrl>https://github.com/chemimage/ZarrSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/chemimage/ZarrSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeBloscManagedBuildOutput</TargetsForTfmSpecificBuildOutput>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeBloscNativeBuildOutput</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="6.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Json" Version="6.0.10" />
+    <PackageReference Include="ZstdSharp.Port" Version="0.8.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Zarr.Codecs.Blosc\Zarr.Codecs.Blosc.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" Link="README.md" Visible="false" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="" Link="LICENSE.md" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="IncludeBloscManagedBuildOutput" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)"
+                            Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' and '%(ReferenceCopyLocalPaths.Filename)%(ReferenceCopyLocalPaths.Extension)' == 'Zarr.Codecs.Blosc.dll'">
+        <TargetPath>%(ReferenceCopyLocalPaths.Filename)%(ReferenceCopyLocalPaths.Extension)</TargetPath>
+      </BuildOutputInPackage>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="IncludeBloscNativeBuildOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutputPath)blosc.dll" Condition="Exists('$(OutputPath)blosc.dll')">
+        <PackagePath>runtimes/win-x64/native/blosc.dll</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="UseGitVersionPackageVersion" AfterTargets="GetVersion" Condition="'$(GitVersion_MajorMinorPatch)' != ''">
+    <PropertyGroup>
+      <Version Condition="'$(GitVersion_PreReleaseLabel)' == ''">$(GitVersion_MajorMinorPatch)</Version>
+      <Version Condition="'$(GitVersion_PreReleaseLabel)' != ''">$(GitVersion_SemVer)</Version>
+      <PackageVersion Condition="'$(GitVersion_PreReleaseLabel)' == ''">$(GitVersion_MajorMinorPatch)</PackageVersion>
+      <PackageVersion Condition="'$(GitVersion_PreReleaseLabel)' != ''">$(GitVersion_FullSemVer)</PackageVersion>
+    </PropertyGroup>
+  </Target>
+
+</Project>

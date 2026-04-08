@@ -1,0 +1,3 @@
+[submodule "src/Zarr.Codecs.Blosc/native/c-blosc"]
+	path = src/Zarr.Codecs.Blosc/native/c-blosc
+	url = https://github.com/blosc/c-blosc

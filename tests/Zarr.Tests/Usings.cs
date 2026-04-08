@@ -1,0 +1,12 @@
+global using Xunit;
+global using ZarrApi = global::Zarr.Api.Zarr;
+global using global::Zarr.Api;
+global using global::Zarr.Abstractions;
+global using global::Zarr.Codecs;
+global using global::Zarr.Core;
+global using global::Zarr.Core.Config;
+global using global::Zarr.Errors;
+global using global::Zarr.Metadata;
+global using global::Zarr.Registry;
+global using global::Zarr.Storage;
+global using global::Zarr.Types;
